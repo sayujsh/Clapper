@@ -1,3 +1,4 @@
 pip install opencv-python
 pip install pyzbar
-pip install moviepy.editor
+pip install pypng
+pip install PyQRCode

@@ -3,8 +3,6 @@ import cv2
 from datetime import datetime
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
-from moviepy.editor import *
-import math
 
 start_time = datetime.now()
 
