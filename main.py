@@ -32,7 +32,6 @@ while (success):
         timeStamps[dataClean] = count
 
 
-
 end_time = datetime.now()
 os.remove('tester.jpg')
 print(timeStamps)
@@ -41,8 +40,6 @@ print('Duration: {}'.format(end_time - start_time))
 
 cap.release()
 cv2.destroyAllWindows()
-
-second = (39/fps)
 
 # trimmer = VideoFileClip('self.mp4')
 # trimmed = trimmer.subclip(t_start=second)
