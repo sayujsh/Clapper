@@ -52,21 +52,35 @@ for key in timeStamps:
         timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
 print(timeStampsCleaned)
 
+<<<<<<< HEAD
+=======
+# Set encoding
+fourcc = cv2.VideoWriter_fourcc(*'VXID')
+>>>>>>> 1768c0e78c5b607f8d0afa344b14f47bef5be629
 
 capture = cv2.VideoCapture(video)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 for key in timeStampsCleaned:
+    # Go to output dir for current scene to write files
     if not (os.path.exists('output/Scene %d' % (key))):
         os.makedirs('output/Scene %d' % (key))
     os.chdir('output/Scene %d' % (key))
+
+    # Creating take files within each scene
     for i, subKey in enumerate(timeStampsCleaned[key]):
+<<<<<<< HEAD
+=======
+        # Initialize the writer
+>>>>>>> 1768c0e78c5b607f8d0afa344b14f47bef5be629
         out = cv2.VideoWriter('Take_%d.mp4' % subKey, fourcc, fps, (1920, 1080))
 
+        # Calculate frame intervals of the takes
         t1 = (timeStampsCleaned[key][subKey])
         t2 = 0
         if (i < len(timeStampsCleaned[key]) - 1):
             t2 = (timeStampsCleaned[key][subKey+1])
         else:
+<<<<<<< HEAD
             t2 = 650
 
         counter = 0
@@ -83,6 +97,17 @@ for key in timeStampsCleaned:
 
 capture.release()
 out.release()
+=======
+            t2 = len(frameArray) - 1
 
+        # Write the take into its own file
+        for i in range(t1, t2):
+            out.write(frameArray[i])
+
+        #Close the writer
+        out.release()
+>>>>>>> 1768c0e78c5b607f8d0afa344b14f47bef5be629
+
+# Timer for keeping track of performance
 end_time = datetime.now()
 print('Duration: {}'.format(end_time - start_time))
