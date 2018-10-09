@@ -19,7 +19,7 @@ success = True
 frameArray = []
 while (success):
     frameArray.append(frame)
-    if((count%fps) == 0):
+    if((count%(fps/2)) == 0):
         cv2.imwrite('tester.jpg', frame)
         success,frame = cap.read()
         count += 1
@@ -57,8 +57,6 @@ for key in timeStamps:
         timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
 print(timeStampsCleaned)
 
-timeStampsCleaned = {1: {1: 166, 2: 321, 3: 471, 4: 636}}
-fps = 30.0
 fourcc = cv2.VideoWriter_fourcc(*'VXID')
 
 for key in timeStampsCleaned:
