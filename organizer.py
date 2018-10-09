@@ -7,7 +7,7 @@ from pyzbar.pyzbar import ZBarSymbol
 start_time = datetime.now()
 
 timeStamps = {}
-video = 'QRTest.mov'
+video = 'test_files\QRTest.mov'
 cap = cv2.VideoCapture(video)
 
 fps = cap.get(cv2.CAP_PROP_FPS)
