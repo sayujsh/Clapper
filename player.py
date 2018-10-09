@@ -3,10 +3,6 @@ import cv2
 from datetime import datetime
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
-<<<<<<< HEAD
-=======
-import math
->>>>>>> 4104b85c5e5ac52728f08cba6ddab0f0281e11a0
 
 start_time = datetime.now()
 
