@@ -60,10 +60,11 @@ print(timeStampsCleaned)
 timeStampsCleaned = {1: {1: 166, 2: 321, 3: 471, 4: 636}}
 fps = 30.0
 fourcc = cv2.VideoWriter_fourcc(*'VXID')
+
 for key in timeStampsCleaned:
-    if not (os.path.exists('Scene %d' % (key))):
-        os.makedirs('Scene %d' % (key))
-    os.chdir('Scene %d' % (key))
+    if not (os.path.exists('output/Scene %d' % (key))):
+        os.makedirs('output/Scene %d' % (key))
+    os.chdir('output/Scene %d' % (key))
     for i, subKey in enumerate(timeStampsCleaned[key]):
         # if(subKey != len(timeStampsCleaned)-1) :
         print(subKey)
