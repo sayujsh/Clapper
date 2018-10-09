@@ -31,7 +31,7 @@ while (success):
         dataClean = (data[0].data).decode('utf8')
         timeStamps[dataClean] = count
 
-    
+
 
 end_time = datetime.now()
 os.remove('tester.jpg')
