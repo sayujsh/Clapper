@@ -4,6 +4,7 @@ import shutil
 from datetime import datetime
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
+import subprocess
 
 start_time = datetime.now()
 
@@ -75,23 +76,28 @@ cv2.destroyAllWindows()
 
 #DOES EVERYTHING IT NEEDS TO BY THIS LINE
 
+os.chdir('output')
+files = os.listdir()
+folders = []
+for item in files:
+    if not ("." in item):
+        folders.append(item)
+folders.sort()
 
+filenames = open("filenames.txt", 'w')
 
+for folder in folders:
+    os.chdir(folder)
+    vidfiles = os.listdir()
+    vidfiles.sort()
+    for item in vidfiles:
+        filenames.write('file \'' + folder + '/' + item + '\'\n')
+    os.chdir("..")
 
+filenames.close()
 
-timeStampsCleaned = {}
-for key in timeStamps:
-    sceneNum = int(key.split(':')[0])
-    takeNum = int(key.split(':')[1])
-    try:
-        timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
-    except:
-        timeStampsCleaned[sceneNum] = {}
-        timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
-
-print(timeStampsCleaned)
-
-
+command = ["ffmpeg", "-f", "concat", "-i", "filenames.txt", "-c", "copy", "roughcut.mp4"]
+subprocess.call(command)
 
 # Timer for keeping track of performance
 end_time = datetime.now()
