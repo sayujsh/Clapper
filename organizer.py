@@ -10,7 +10,7 @@ start_time = datetime.now()
 
 def trim(start,end,input,output):
 	str = 'ffmpeg -i ' + input + " -ss  " + start + " -to " + end + " -c copy " + output
-	os.system(str)
+	subprocess.call(str)
 
 timeStamps = {}
 video = r'test_files\QRTest.mov'
@@ -76,6 +76,7 @@ cv2.destroyAllWindows()
 
 #DOES EVERYTHING IT NEEDS TO BY THIS LINE
 
+# Finding the files again and sorting them
 os.chdir('output')
 files = os.listdir()
 folders = []
@@ -84,8 +85,9 @@ for item in files:
         folders.append(item)
 folders.sort()
 
-filenames = open("filenames.txt", 'w')
+filenames = open("filenames.txt", "w")
 
+# Add all the file names to a txt for concatenation
 for folder in folders:
     os.chdir(folder)
     vidfiles = os.listdir()
@@ -96,8 +98,11 @@ for folder in folders:
 
 filenames.close()
 
-command = ["ffmpeg", "-f", "concat", "-i", "filenames.txt", "-c", "copy", "roughcut.mp4"]
+# Concatenate and remove the txt file
+os.chdir("..")
+command = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "output/filenames.txt", "-c", "copy", "output/roughcut.mp4"]
 subprocess.call(command)
+os.remove('output/filenames.txt')
 
 # Timer for keeping track of performance
 end_time = datetime.now()
