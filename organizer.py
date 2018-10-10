@@ -46,19 +46,19 @@ while (success):
                 trim( str(frame1/fps), str(frame2/fps - 1), video, fileName)
                 sceneNum = int(timeStamp1.split(':')[0])
                 takeNum = int(timeStamp1.split(':')[1])
-                
+
                 timeStamp1 = dataClean
                 frame1 = count
                 fileNameFinal = timeStamp1.split(':')[0] + '.' + timeStamp1.split(':')[1] + '.mp4'
                 sceneNumFinal = int(timeStamp1.split(':')[0])
                 takeNumFinal = int(timeStamp1.split(':')[1])
-                
+
                 if not (os.path.exists('output/Scene %d' % (sceneNum))):
                     os.makedirs('output/Scene %d' % (sceneNum))
                 dirName = ('output/Scene %d' % (sceneNum)) + ('/Take %d' % (takeNum)) + '.mp4'
                 shutil.move(fileName, dirName)
 
-            
+
     else:
         success,frame = cap.read()
         count += 1
