@@ -28,7 +28,7 @@ while (success):
         else:
             dataClean = (data[0].data).decode('utf8')
             timeStamps[dataClean] = count
-            
+
     else:
         success,frame = cap.read()
         count += 1
@@ -54,7 +54,7 @@ print(timeStampsCleaned)
 
 
 capture = cv2.VideoCapture(video)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+cv2.VideoWriter_fourcc(*'mp4v')
 for key in timeStampsCleaned:
     # Go to output dir for current scene to write files
     if not (os.path.exists('output/Scene %d' % (key))):
