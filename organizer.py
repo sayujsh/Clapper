@@ -6,7 +6,61 @@ from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 import subprocess
 
+from tkinter import *
+from tkinter import ttk
+from tkinter.filedialog import askopenfilename
+
+root = Tk()
+frame = Frame(root)
+frame.pack()
+
+Title = root.title( "Clapper" )
+label = ttk.Label(root, text ="Welcome to Clapper",foreground="black",font=("Helvetica", 16))
+label.pack()
+
+current = os.getcwd()
+
+def OpenFile():
+    global inputDir
+    global inputVideo
+    # Get the file
+    file = askopenfilename(initialdir=current)
+    # Split the filepath to get the directory
+    inputDir = os.path.split(file)[0]
+    inputVideo = os.path.split(file)[1]
+
+
+def show_entry_fields():
+    global projectName
+    projectName = (User_input.get())
+    print("Project Name: %s" % projectName)
+    root.destroy()
+
+
+button = Button(frame, 
+                   text="Browse", 
+                   fg="black",
+                   font=("Helvetica", 8),
+                   command=OpenFile)
+button.pack(side=LEFT)
+
+User_input = Entry(root)
+User_input.pack()
+
+Button(root, text='Process', command=show_entry_fields).pack()
+
+
+root.mainloop()
+
+
+
+
+
+
+
+
 start_time = datetime.now()
+
 
 
 # Edits a given video by the starting and ending points of the video
@@ -16,8 +70,11 @@ def trim(start,end,input,output):
 	str = 'ffmpeg -i ' + input + " -ss  " + start + " -to " + end + " -c copy " + output
 	subprocess.call(str)
 
+shutil.copy(inputDir+'/'+inputVideo, current)
+# os.chdir(inputDir)
+
 timeStamps = {}
-video = r'test_files\QRTest.mov'
+video = inputVideo
 cap = cv2.VideoCapture(video)
 
 fps = cap.get(cv2.CAP_PROP_FPS)
@@ -58,9 +115,9 @@ while (success):
                 sceneNumFinal = int(timeStamp1.split(':')[0])
                 takeNumFinal = int(timeStamp1.split(':')[1])
 
-                if not (os.path.exists('output/Scene %d' % (sceneNum))):
-                    os.makedirs('output/Scene %d' % (sceneNum))
-                dirName = ('output/Scene %d' % (sceneNum)) + ('/Take %d' % (takeNum)) + '.mp4'
+                if not (os.path.exists('%s/Scene %d' % (projectName,sceneNum))):
+                    os.makedirs('%s/Scene %d' % (projectName, sceneNum))
+                dirName = ('%s/Scene %d' % (projectName,sceneNum)) + ('/Take %d' % (takeNum)) + '.mp4'
                 shutil.move(fileName, dirName)
 
 
@@ -69,19 +126,19 @@ while (success):
         count += 1
 
 trim( str(frame1/fps), str(count/fps), video, fileNameFinal)
-if not (os.path.exists('output/Scene %d' % (sceneNumFinal))):
-    os.makedirs('output/Scene %d' % (sceneNumFinal))
-dirNameFinal = ('output/Scene %d' % (sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
+if not (os.path.exists('%s/Scene %d' % (projectName,sceneNum))):
+    os.makedirs('%s/Scene %d' % (projectName,sceneNum))
+dirNameFinal = ('%s/Scene %d' % (projectName,sceneNum)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
 shutil.move(fileNameFinal, dirNameFinal)
 os.remove('tester.jpg')
-
 cap.release()
 cv2.destroyAllWindows()
+os.remove(video)
 
 #DOES EVERYTHING IT NEEDS TO BY THIS LINE
 
 # Finding the files again and sorting them
-os.chdir('output')
+os.chdir(projectName)
 files = os.listdir()
 folders = []
 for item in files:
@@ -104,9 +161,9 @@ filenames.close()
 
 # Concatenate and remove the txt file
 os.chdir("..")
-command = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "output/filenames.txt", "-c", "copy", "output/roughcut.mp4"]
+command = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
 subprocess.call(command)
-os.remove('output/filenames.txt')
+os.remove('%s/filenames.txt' % (projectName))
 
 # Timer for keeping track of performance
 end_time = datetime.now()
