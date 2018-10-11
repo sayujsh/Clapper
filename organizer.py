@@ -8,6 +8,10 @@ import subprocess
 
 start_time = datetime.now()
 
+
+# Edits a given video by the starting and ending points of the video
+# Uses subprocess to call ffmpeg application to edit the video
+# As long as it is in the same folder as this python script it will work
 def trim(start,end,input,output):
 	str = 'ffmpeg -i ' + input + " -ss  " + start + " -to " + end + " -c copy " + output
 	subprocess.call(str)
@@ -18,10 +22,10 @@ cap = cv2.VideoCapture(video)
 
 fps = cap.get(cv2.CAP_PROP_FPS)
 
-success, image = cap.read()
-frame = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-count = 0
+success, frame = cap.read()
+
 success = True
+count = 0
 frame1 = 0
 switch = 0
 timeStamp1 = ''
