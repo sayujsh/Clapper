@@ -6,17 +6,17 @@ from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 import subprocess
 
-from tkinter import *
-from tkinter import ttk
+from tkinter import Tk, ttk, Frame, Button, Entry
 from tkinter.filedialog import askopenfilename
 
 root = Tk()
-frame = Frame(root)
-frame.pack()
 
 Title = root.title( "Clapper" )
 label = ttk.Label(root, text ="Welcome to Clapper",foreground="black",font=("Helvetica", 16))
 label.pack()
+
+frame = Frame(root)
+frame.pack()
 
 current = os.getcwd()
 
@@ -36,16 +36,21 @@ def show_entry_fields():
     print("Project Name: %s" % projectName)
     root.destroy()
 
-
-button = Button(frame, 
-                   text="Browse", 
+Label(frame, text="Target File:").grid(row=2)
+button = Button(frame,
+                   text="Browse",
                    fg="black",
                    font=("Helvetica", 8),
                    command=OpenFile)
-button.pack(side=LEFT)
+<<<<<<< HEAD
+button.pack()
+=======
+button.grid(row=2, column=1)
+>>>>>>> 47729e82add87763a851ecc83c4d07d31bc8ef2a
 
-User_input = Entry(root)
-User_input.pack()
+Label(frame, text="Project Name:").grid(row=1)
+User_input = Entry(frame)
+User_input.grid(row=1, column=1)
 
 Button(root, text='Process', command=show_entry_fields).pack()
 
