@@ -6,7 +6,7 @@ from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 import subprocess
 
-from tkinter import Tk, ttk, Frame, Button, Entry
+from tkinter import Tk, ttk, Frame, Button, Entry, Grid, Label
 from tkinter.filedialog import askopenfilename
 
 root = Tk()
@@ -42,11 +42,12 @@ button = Button(frame,
                    fg="black",
                    font=("Helvetica", 8),
                    command=OpenFile)
-<<<<<<< HEAD
-button.pack()
-=======
+
+
 button.grid(row=2, column=1)
->>>>>>> 47729e82add87763a851ecc83c4d07d31bc8ef2a
+
+button.grid(row=2, column=1)
+
 
 Label(frame, text="Project Name:").grid(row=1)
 User_input = Entry(frame)
