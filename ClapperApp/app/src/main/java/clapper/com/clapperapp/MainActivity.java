@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (scene > 0) {
+                if (scene > 1) {
                     scene--;
                     take = 1;
                 }
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (take > 0) {
+                if (take > 1) {
                     take--;
                 }
 
