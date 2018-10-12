@@ -167,8 +167,9 @@ filenames.close()
 
 # Concatenate and remove the txt file
 os.chdir("..")
-COMMAND = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
-subprocess.call(COMMAND)
+ffmpegCall = (r'%s\ffmpeg' % current)
+COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
+subprocess.call(COMMAND, shell=True)
 os.remove('%s/filenames.txt' % (projectName))
 
 # Timer for keeping track of performance
