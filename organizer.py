@@ -73,11 +73,11 @@ start_time = datetime.now()
 # Uses subprocess to call ffmpeg application to edit the video
 # As long as it is in the same folder as this python script it will work
 def trim(start,end,input,output):
-	str = 'ffmpeg -i ' + input + " -ss  " + start + " -to " + end + " -c copy " + output
-	subprocess.call(str)
+    ffmpegCall = (r'"%s\ffmpeg"' % current)
+    str = ffmpegCall + ' -i ' + input + " -ss  " + start + " -to " + end + " -c copy " + output
+    subprocess.call(str)
 
-shutil.copy(inputDir+'/'+inputVideo, current)
-# os.chdir(inputDir)
+os.chdir(inputDir)
 
 timeStamps = {}
 video = inputVideo
@@ -139,9 +139,11 @@ shutil.move(fileNameFinal, dirNameFinal)
 os.remove('tester.jpg')
 cap.release()
 cv2.destroyAllWindows()
-os.remove(video)
-
 #DOES EVERYTHING IT NEEDS TO BY THIS LINE
+
+
+
+
 
 # Finding the files again and sorting them
 os.chdir(projectName)
