@@ -171,6 +171,9 @@ COMMAND = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (p
 subprocess.call(COMMAND)
 os.remove('%s/filenames.txt' % (projectName))
 
+
+
+
 # Timer for keeping track of performance
 END_TIME = datetime.now()
 print('Duration: {}'.format(END_TIME - START_TIME))
