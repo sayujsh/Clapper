@@ -22,26 +22,28 @@ class Window(object):
     def AddWidgets(self):
         global User_input
         fontColor = 'white'
-        self.TopFrame = Frame(self.master, bg='black', width=400, height=50)
+        bgColor = 'black'
+        
+        self.TopFrame = Frame(self.master, bg=bgColor, width=400, height=50)
         self.TopFrame.grid(row=1, column=0)
 
-        self.TextLabel = Label(self.master, text="Welcome to Clapper", font="Laksaman", fg="white", bg="black")
+        self.TextLabel = Label(self.master, text="Welcome to Clapper", font="Laksaman", fg=fontColor, bg=bgColor)
         self.TextLabel.grid(row=1, column=0, padx=10, pady=10)
 
-        self.TextLabel = Label(self.master, text="Project Title", font="Laksaman", fg="white", bg="black")
+        self.TextLabel = Label(self.master, text="Project Title", font="Laksaman", fg=fontColor, bg=bgColor)
         self.TextLabel.grid(row=2, sticky='W', padx=10, pady=10)
 
-        self.TextLabel = Label(self.master, text="Video File", font="Laksaman", fg="white", bg="black")
+        self.TextLabel = Label(self.master, text="Video File", font="Laksaman", fg=fontColor, bg=bgColor)
         self.TextLabel.grid(row=3, sticky='W', padx=10, pady=10)
 
-        self.User_input = Entry(self.master, width=10, bd=0, fg="black", bg="white")
+        self.User_input = Entry(self.master, width=10, bd=0, fg=bgColor, bg=fontColor)
         self.User_input.grid(row=2, column=0)
         User_input = self.User_input
 
-        self.button = Button(self.master, text="Browse", cursor="hand2", width=10, height=1, bd=0, fg="black", bg="white", activeforeground="black", activebackground="white", font=("Laksaman", 8), command=self.OpenFile)
+        self.button = Button(self.master, text="Browse", cursor="hand2", width=10, height=1, bd=0, fg=bgColor, bg=fontColor, activeforeground=bgColor, activebackground=fontColor, font=("Laksaman", 8), command=self.OpenFile)
         self.button.grid(row=3, column=0, padx=10, pady=10)
 
-        self.button = Button(self.master, text="Process", cursor="hand2", width=10, height=1, bd=0, fg="black", bg="white", activeforeground="black", activebackground="white", font=("Laksaman", 8), command=self.Process)
+        self.button = Button(self.master, text="Process", cursor="hand2", width=10, height=1, bd=0, fg=bgColor, bg=fontColor, activeforeground=bgColor, activebackground=fontColor, font=("Laksaman", 8), command=self.Process)
         self.button.grid(row=4, column=0, padx=10, pady=10)
 
     def OpenFile(self):
