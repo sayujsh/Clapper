@@ -8,63 +8,67 @@ import cv2
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 
-
-
-
-root = Tk()
-
-Title = root.title("Clapper")
-label = ttk.Label(root, text="Welcome to Clapper", foreground="black", font=("Helvetica", 16))
-label.pack()
-
-frame = Frame(root)
-frame.pack()
-
 current = os.getcwd()
 
-def OpenFile():
-    global inputDir
-    global inputVideo
-    # Get the file
-    file = askopenfilename(initialdir=current)
-    # Split the filepath to get the directory
-    inputDir = os.path.split(file)[0]
-    inputVideo = os.path.split(file)[1]
+class Window(object):
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Clapper")
+        self.master.geometry('400x250+450+200')
+        self.master.config(bg="#191414")
+        # self.master.resizable(0,0)
+        self.AddWidgets()
 
+    def AddWidgets(self):
+        global User_input
+        self.TopFrame = Frame(self.master, bg='#1DB954', width=400, height=50)
+        self.TopFrame.grid(row=1, column=0)
 
-def show_entry_fields():
-    global projectName
-    projectName = (User_input.get())
-    print("Project Name: %s" % projectName)
-    root.destroy()
+        self.TextLabel = Label(self.master, text="Welcome to Clapper", font="Laksaman", fg="white", bg="#1DB954")
+        self.TextLabel.grid(row=1, column=0, padx=10, pady=10)
 
-Label(frame, text="Target File:").grid(row=2)
-button = Button(frame, text="Browse", fg="black", font=("Helvetica", 8), command=OpenFile)
+        self.TextLabel = Label(self.master, text="Project Title", font="Laksaman", fg="white", bg="#191414")
+        self.TextLabel.grid(row=2, sticky='W', padx=10, pady=10)
 
+        self.TextLabel = Label(self.master, text="Video File", font="Laksaman", fg="white", bg="#191414")
+        self.TextLabel.grid(row=3, sticky='W', padx=10, pady=10)
 
-button.grid(row=2, column=1)
+        self.User_input = Entry(self.master, width=10, bd=0, fg="black", bg="white")
+        self.User_input.grid(row=2, column=0)
+        User_input = self.User_input
 
-button.grid(row=2, column=1)
+        self.button = Button(self.master, text="Browse", cursor="hand2", width=10, height=1, bd=0, fg="white", bg="#1DB954", activeforeground="white", activebackground="#1DB954", font=("Laksaman", 8), command=self.OpenFile)
+        self.button.grid(row=3, column=0, padx=10, pady=10)
 
+        self.button = Button(self.master, text="Process", cursor="hand2", width=10, height=1, bd=0, fg="white", bg="#1DB954", activeforeground="white", activebackground="#1DB954", font=("Laksaman", 8), command=self.Process)
+        self.button.grid(row=4, column=0, padx=10, pady=10)
 
-Label(frame, text="Project Name:").grid(row=1)
-User_input = Entry(frame)
-User_input.grid(row=1, column=1)
+    def OpenFile(self):
+        global inputDir
+        global inputVideo
+        # Get the file
+        file = askopenfilename(initialdir=current)
+        # Split the filepath to get the directory
+        inputDir = os.path.split(file)[0]
+        inputVideo = os.path.split(file)[1]
 
-Button(root, text='Process', command=show_entry_fields).pack()
+    def Process(self):
+        global projectName
+        projectName = (User_input.get())
+        print("Project Name: %s" % projectName)
+        root.destroy()
 
-
+root = Tk()
+root.tk.call('tk', 'scaling', 2.0)
+Window = Window(root)
 root.mainloop()
 
 
 
 
 
-
-
-
+# Timer for keeping track of performance
 START_TIME = datetime.now()
-
 
 
 # Edits a given video by the starting and ending points of the video
