@@ -14,16 +14,16 @@ class Window(object):
     def __init__(self, master):
         self.master = master
         self.master.title("Clapper")
-        self.master.geometry('400x250+450+200')
-        self.master.config(bg="black")
-        # self.master.resizable(0,0)
+        self.master.geometry('400x200+450+200')
+        self.master.config(bg="#1b1b1b")
+        self.master.resizable(0,0)
         self.AddWidgets()
 
     def AddWidgets(self):
         global User_input
-        fontColor = 'white'
-        bgColor = 'black'
-        
+        fontColor = '#f8bbd0'
+        bgColor = '#1b1b1b'
+
         self.TopFrame = Frame(self.master, bg=bgColor, width=400, height=50)
         self.TopFrame.grid(row=1, column=0)
 
@@ -36,14 +36,14 @@ class Window(object):
         self.TextLabel = Label(self.master, text="Video File", font="Laksaman", fg=fontColor, bg=bgColor)
         self.TextLabel.grid(row=3, sticky='W', padx=10, pady=10)
 
-        self.User_input = Entry(self.master, width=10, bd=0, fg=bgColor, bg=fontColor)
+        self.User_input = ttk.Entry(self.master, width=15)
         self.User_input.grid(row=2, column=0)
         User_input = self.User_input
 
-        self.button = Button(self.master, text="Browse", cursor="hand2", width=10, height=1, bd=0, fg=bgColor, bg=fontColor, activeforeground=bgColor, activebackground=fontColor, font=("Laksaman", 8), command=self.OpenFile)
+        self.button = ttk.Button(self.master, text="Browse", cursor="hand2", width=10, command=self.OpenFile)
         self.button.grid(row=3, column=0, padx=10, pady=10)
 
-        self.button = Button(self.master, text="Process", cursor="hand2", width=10, height=1, bd=0, fg=bgColor, bg=fontColor, activeforeground=bgColor, activebackground=fontColor, font=("Laksaman", 8), command=self.Process)
+        self.button = ttk.Button(self.master, text="Process", cursor="hand2", width=10, command=self.Process)
         self.button.grid(row=4, column=0, padx=10, pady=10)
 
     def OpenFile(self):
@@ -62,7 +62,7 @@ class Window(object):
         root.destroy()
 
 root = Tk()
-root.tk.call('tk', 'scaling', 2.0)
+# root.tk.call('tk', 'scaling', 3.0)
 Window = Window(root)
 root.mainloop()
 
