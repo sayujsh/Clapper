@@ -40,6 +40,9 @@ class Window(Frame):
         self.TextLabel = Label(self.master, text="Video File", font="Laksaman", fg=fontColor, bg=bgColor)
         self.TextLabel.grid(row=3, sticky='W', padx=10, pady=10)
 
+        self.TextLabel = Label(self.master, text="Organization:", font="Laksaman", fg=fontColor, bg=bgColor)
+        self.TextLabel.grid(row=4, sticky='W', padx=10, pady=10)
+
         self.User_input = ttk.Entry(self.master, width=15)
         self.User_input.grid(row=2, column=0)
         User_input = self.User_input
@@ -47,16 +50,18 @@ class Window(Frame):
         self.button = ttk.Button(self.master, text="Browse", cursor="hand2", width=10, command=self.OpenFile)
         self.button.grid(row=3, column=0, padx=10, pady=10)
 
-        self.processButton = ttk.Button(self.master, text="Process", cursor="hand2", width=10, command=self.Process)
+        self.processButton = ttk.Button(self.master, text="Start", cursor="hand2", width=10, command=self.Process)
         self.processButton.grid(row=4, column=0, padx=10, pady=10)
 
         # Hidden Initially
 
-        self.OrgLabel = Label(self.master, text="Organizing...", font="Laksaman", fg=fontColorDull, bg=bgColor)
+        self.OrgLabel = Label(self.master, text="Organizing...", font=("Laksaman", 12), fg=fontColorDull, bg=bgColor)
 
-        self.CutLabel = Label(self.master, text="Compiling Rough Cut...", font="Laksaman", fg=fontColorDull, bg=bgColor)
+        self.CutLabel = Label(self.master, text="Compiling...", font=("Laksaman", 12), fg=fontColorDull, bg=bgColor)
 
-        self.CutButton = ttk.Button(self.master, text="Generate Rough Cut", cursor="hand2", width=10, command=self.CompileCut)
+        self.RoughLabel = Label(self.master, text="Rough Cut:", font="Laksaman", fg=fontColorDull, bg=bgColor)
+
+        self.CutButton = ttk.Button(self.master, text="Start", cursor="hand2", width=10, command=self.CompileCut)
 
         self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL,length=100,  mode='determinate')
 
@@ -154,6 +159,7 @@ class Window(Frame):
             self.progress.grid_forget()
             self.OrgLabel['text'] = "Organized!"
             self.CutButton.grid(row=5, column=0, padx=10, pady=10)
+            self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
 
 
         orgthread = threading.Thread(target=org_thread)
@@ -166,34 +172,48 @@ class Window(Frame):
 
 
     def CompileCut(self):
-        # Finding the files again and sorting them
-        os.chdir(projectName)
-        files = os.listdir()
-        folders = []
-        for item in files:
-            if not "." in item:
-                folders.append(item)
-        folders.sort()
 
-        filenames = open("filenames.txt", "w")
+        def cut_thread():
+            self.CutButton.grid_forget()
+            self.CutLabel.grid(row=5, column=0, padx=10, pady=10)
+            self.progress.grid(row=5, sticky='E', padx=10, pady=10)
+            self.progress.start()
 
-        # Add all the file names to a txt for concatenation
-        for folder in folders:
-            os.chdir(folder)
-            vidfiles = os.listdir()
-            vidfiles.sort()
-            for item in vidfiles:
-                filenames.write('file \'' + folder + '/' + item + '\'\n')
+            # Finding the files again and sorting them
+            os.chdir(projectName)
+            files = os.listdir()
+            folders = []
+            for item in files:
+                if not "." in item:
+                    folders.append(item)
+            folders.sort()
+
+            filenames = open("filenames.txt", "w")
+
+            # Add all the file names to a txt for concatenation
+            for folder in folders:
+                os.chdir(folder)
+                vidfiles = os.listdir()
+                vidfiles.sort()
+                for item in vidfiles:
+                    filenames.write('file \'' + folder + '/' + item + '\'\n')
+                os.chdir("..")
+
+            filenames.close()
+
+            # Concatenate and remove the txt file
             os.chdir("..")
+            ffmpegCall = (r'%s\ffmpeg' % current)
+            COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
+            subprocess.call(COMMAND, shell=True)
+            os.remove('%s/filenames.txt' % (projectName))
 
-        filenames.close()
+            self.progress.stop()
+            self.progress.grid_forget()
+            self.CutLabel['text'] = "Generated!"
 
-        # Concatenate and remove the txt file
-        os.chdir("..")
-        ffmpegCall = (r'%s\ffmpeg' % current)
-        COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
-        subprocess.call(COMMAND, shell=True)
-        os.remove('%s/filenames.txt' % (projectName))
+        cutthread = threading.Thread(target=cut_thread)
+        cutthread.start()
 
 
     # Edits a given video by the starting and ending points of the video
