@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import time
 from datetime import datetime
@@ -85,6 +86,7 @@ class Window(Frame):
         START_TIME = datetime.now()
 
         def org_thread():
+            global timeStampsCleaned
             self.processButton.grid_forget()
             self.OrgLabel.grid(row=4, column=0, padx=10, pady=10)
             self.progress.grid(row=4, sticky='E', padx=10, pady=10)
@@ -145,6 +147,18 @@ class Window(Frame):
                 else:
                     success, frame = cap.read()
                     count += 1
+            print(timeStamps)
+            timeStampsCleaned = {}
+
+            for key in timeStamps:
+                sceneNum = int(key.split(':')[0])
+                takeNum = int(key.split(':')[1])
+                try:
+                    timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
+                except:
+                    timeStampsCleaned[sceneNum] = {}
+                    timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
+            print(timeStampsCleaned)
 
             self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
             if not os.path.exists('%s/Scene %d' % (projectName, sceneNum)):
@@ -161,14 +175,12 @@ class Window(Frame):
             self.CutButton.grid(row=5, column=0, padx=10, pady=10)
             self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
 
+            # Timer for keeping track of performance
+            END_TIME = datetime.now()
+            print('Duration to Organize: {}'.format(END_TIME - START_TIME))
 
         orgthread = threading.Thread(target=org_thread)
         orgthread.start()
-
-
-        # Timer for keeping track of performance
-        END_TIME = datetime.now()
-        print('Duration to Organize: {}'.format(END_TIME - START_TIME))
 
 
     def CompileCut(self):
@@ -178,35 +190,27 @@ class Window(Frame):
             self.CutLabel.grid(row=5, column=0, padx=10, pady=10)
             self.progress.grid(row=5, sticky='E', padx=10, pady=10)
             self.progress.start()
-
-            # Finding the files again and sorting them
-            os.chdir(projectName)
-            files = os.listdir()
+            wantedTakes = {}
             folders = []
-            for item in files:
-                if not "." in item:
-                    folders.append(item)
-            folders.sort()
+            for scene in timeStampsCleaned:
+                wantedTake = input("What take would you like for scene %s?  " %scene)
+                wantedTakes[scene] = wantedTake
+                wantedFile = (projectName + (r'\Scene %s\Take %s.mp4' % (scene, wantedTake)))
+                print(wantedFile)
+                folders.append(wantedFile)
 
             filenames = open("filenames.txt", "w")
 
             # Add all the file names to a txt for concatenation
             for folder in folders:
-                os.chdir(folder)
-                vidfiles = os.listdir()
-                vidfiles.sort()
-                for item in vidfiles:
-                    filenames.write('file \'' + folder + '/' + item + '\'\n')
-                os.chdir("..")
-
+                filenames.write("file '" + folder + "'")
             filenames.close()
 
             # Concatenate and remove the txt file
-            os.chdir("..")
             ffmpegCall = (r'%s\ffmpeg' % current)
-            COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "%s/filenames.txt" % (projectName), "-c", "copy", "%s/roughcut.mp4" % (projectName)]
+            COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
             subprocess.call(COMMAND, shell=True)
-            os.remove('%s/filenames.txt' % (projectName))
+            os.remove('filenames.txt')
 
             self.progress.stop()
             self.progress.grid_forget()
@@ -215,14 +219,13 @@ class Window(Frame):
         cutthread = threading.Thread(target=cut_thread)
         cutthread.start()
 
-
     # Edits a given video by the starting and ending points of the video
     # Uses subprocess to call ffmpeg application to edit the video
     # As long as it is in the same folder as this python script it will work
     def trim(self, start, end, inputVid, outputVid):
         ffmpegCall = (r'"%s\ffmpeg"' % current)
         trim_command = ffmpegCall + ' -i ' + inputVid + " -ss  " + start + " -to " + end + " -c copy " + outputVid
-        subprocess.call(trim_command)
+        subprocess.call(trim_command, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
 
 root = Tk()
