@@ -1,15 +1,13 @@
 import os
-import sys
 import shutil
-import time
-from datetime import datetime
-import subprocess
-from tkinter import Tk, ttk, Frame, Button, Entry, Label, HORIZONTAL
-from tkinter.filedialog import askopenfilename
-import cv2
-from pyzbar.pyzbar import decode
-from pyzbar.pyzbar import ZBarSymbol
 import threading
+import cv2
+from subprocess import call, DEVNULL
+from datetime import datetime
+from tkinter import Tk, ttk, Frame, Label, HORIZONTAL, messagebox
+from tkinter.filedialog import askopenfilename
+from pyzbar.pyzbar import decode, ZBarSymbol
+
 
 current = os.getcwd()
 
@@ -20,7 +18,7 @@ class Window(Frame):
         self.master.title("Clapper")
         self.master.geometry('400x250+450+200')
         self.master.config(bg="#1b1b1b")
-        self.master.resizable(0,0)
+        self.master.resizable(0, 0)
         self.AddWidgets()
 
     def AddWidgets(self):
@@ -64,13 +62,13 @@ class Window(Frame):
 
         self.CutButton = ttk.Button(self.master, text="Start", cursor="hand2", width=10, command=self.CompileCut)
 
-        self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL,length=100,  mode='determinate')
+        self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL, length=100,  mode='determinate')
 
     def OpenFile(self):
         global inputDir
         global inputVideo
         # Get the file
-        file = askopenfilename(initialdir=current)
+        file = askopenfilename(initialdir=current, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
         # Split the filepath to get the directory
         inputDir = os.path.split(file)[0]
         inputVideo = os.path.split(file)[1]
@@ -178,6 +176,7 @@ class Window(Frame):
             # Timer for keeping track of performance
             END_TIME = datetime.now()
             print('Duration to Organize: {}'.format(END_TIME - START_TIME))
+            messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
         orgthread = threading.Thread(target=org_thread)
         orgthread.start()
@@ -209,12 +208,14 @@ class Window(Frame):
             # Concatenate and remove the txt file
             ffmpegCall = (r'%s\ffmpeg' % current)
             COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
-            subprocess.call(COMMAND, shell=True)
+            call(COMMAND, shell=True, stderr=DEVNULL, stdout=DEVNULL)
             os.remove('filenames.txt')
 
             self.progress.stop()
             self.progress.grid_forget()
             self.CutLabel['text'] = "Generated!"
+            messagebox.showinfo("Finished", "Finished Editing. A rough cut of your project will be in your project folder.")
+
 
         cutthread = threading.Thread(target=cut_thread)
         cutthread.start()
@@ -225,7 +226,7 @@ class Window(Frame):
     def trim(self, start, end, inputVid, outputVid):
         ffmpegCall = (r'"%s\ffmpeg"' % current)
         trim_command = ffmpegCall + ' -i ' + inputVid + " -ss  " + start + " -to " + end + " -c copy " + outputVid
-        subprocess.call(trim_command, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        call(trim_command, stderr=DEVNULL, stdout=DEVNULL)
 
 
 root = Tk()
