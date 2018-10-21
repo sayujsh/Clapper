@@ -159,9 +159,9 @@ class Window(Frame):
             print(timeStampsCleaned)
 
             self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
-            if not os.path.exists('%s/Scene %d' % (projectName, sceneNum)):
-                os.makedirs('%s/Scene %d' % (projectName, sceneNum))
-            dirNameFinal = ('%s/Scene %d' % (projectName, sceneNum)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
+            if not os.path.exists('%s/Scene %d' % (projectName, sceneNumFinal)):
+                os.makedirs('%s/Scene %d' % (projectName, sceneNumFinal))
+            dirNameFinal = ('%s/Scene %d' % (projectName, sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
             shutil.move(fileNameFinal, dirNameFinal)
             os.remove('tester.jpg')
             cap.release()
