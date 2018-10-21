@@ -146,6 +146,7 @@ class Window(Frame):
                     success, frame = cap.read()
                     count += 1
             print(timeStamps)
+            print(count)
             timeStampsCleaned = {}
 
             for key in timeStamps:
@@ -202,7 +203,7 @@ class Window(Frame):
 
             # Add all the file names to a txt for concatenation
             for folder in folders:
-                filenames.write("file '" + folder + "'")
+                filenames.write("file '" + folder + "'\n")
             filenames.close()
 
             # Concatenate and remove the txt file
