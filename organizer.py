@@ -145,8 +145,6 @@ class Window(Frame):
                 else:
                     success, frame = cap.read()
                     count += 1
-            print(timeStamps)
-            print(count)
             timeStampsCleaned = {}
 
             for key in timeStamps:
@@ -157,13 +155,15 @@ class Window(Frame):
                 except:
                     timeStampsCleaned[sceneNum] = {}
                     timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
-            print(timeStampsCleaned)
 
             self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
             if not os.path.exists('%s/Scene %d' % (projectName, sceneNumFinal)):
                 os.makedirs('%s/Scene %d' % (projectName, sceneNumFinal))
             dirNameFinal = ('%s/Scene %d' % (projectName, sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
             shutil.move(fileNameFinal, dirNameFinal)
+
+            print(timeStampsCleaned)
+
             os.remove('tester.jpg')
             cap.release()
             cv2.destroyAllWindows()
@@ -210,6 +210,7 @@ class Window(Frame):
             ffmpegCall = (r'%s\ffmpeg' % current)
             COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
             call(COMMAND, shell=True, stderr=DEVNULL, stdout=DEVNULL)
+            print("Finished creating a rough cut.")
             os.remove('filenames.txt')
 
             self.progress.stop()
@@ -228,6 +229,7 @@ class Window(Frame):
         ffmpegCall = (r'"%s\ffmpeg"' % current)
         trim_command = ffmpegCall + ' -i ' + inputVid + " -ss  " + start + " -to " + end + " -c copy " + outputVid
         call(trim_command, stderr=DEVNULL, stdout=DEVNULL)
+        print("Finished cutting: %s" % outputVid)
 
 
 root = Tk()
