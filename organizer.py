@@ -4,7 +4,7 @@ import threading
 import cv2
 from subprocess import call, DEVNULL
 from datetime import datetime
-from tkinter import Tk, ttk, Frame, Label, HORIZONTAL, messagebox
+from tkinter import Tk, ttk, Frame, Label, HORIZONTAL, messagebox, OptionMenu, StringVar
 from tkinter.filedialog import askopenfilename
 from pyzbar.pyzbar import decode, ZBarSymbol
 
@@ -16,9 +16,9 @@ class Window(Frame):
         super().__init__()
         self.master = master
         self.master.title("Clapper")
-        self.master.geometry('400x250+450+200')
+        self.master.geometry('400x450+450+200')
         self.master.config(bg="#1b1b1b")
-        self.master.resizable(0, 0)
+        # self.master.resizable(0, 0)
         self.AddWidgets()
 
     def AddWidgets(self):
@@ -60,9 +60,31 @@ class Window(Frame):
 
         self.RoughLabel = Label(self.master, text="Rough Cut:", font="Laksaman", fg=fontColorDull, bg=bgColor)
 
-        self.CutButton = ttk.Button(self.master, text="Start", cursor="hand2", width=10, command=self.CompileCut)
+        self.CutButton = ttk.Button(self.master, text="Start", cursor="hand2", width=10, command=self.ScenePicker)
 
         self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL, length=100,  mode='determinate')
+
+    def ScenePicker(self):
+        global folders
+        global variables
+        global wantedTakes
+        i = 7
+        wantedTakes = {}
+        folders = []
+        for scene in timeStampsCleaned:
+            takeList = list(timeStampsCleaned[scene].keys())
+            wantedTakes[scene] = StringVar(self.master)
+            wantedTakes[scene].set(takeList[0])
+            self.PickerLabel = Label(self.master, text=("What take would you like for scene %s" % scene))
+            self.PickerLabel.grid(row = i, column = 0)
+            self.Picker = OptionMenu(self.master, wantedTakes[scene], *takeList)
+            self.Picker.grid(row = i+1, column = 0)
+            i += 2
+
+
+
+        self.finishedButton = ttk.Button(self.master, text="Finish", cursor="hand2", width=10, command=self.CompileCut)
+        self.finishedButton.grid(row = i+1, column = 0)
 
     def OpenFile(self):
         global inputDir
@@ -184,19 +206,15 @@ class Window(Frame):
 
         def cut_thread():
             START_TIME = datetime.now()
+            for scene in timeStampsCleaned:
+                wantedFile = (projectName + (r'\Scene %s\Take %s.mp4' % (scene, wantedTakes[scene].get())))
+                print(wantedFile)
+                folders.append(wantedFile)
+
             self.CutButton.grid_forget()
             self.CutLabel.grid(row=5, column=0, padx=10, pady=10)
             self.progress.grid(row=5, sticky='E', padx=10, pady=10)
             self.progress.start()
-            wantedTakes = {}
-            folders = []
-            for scene in timeStampsCleaned:
-                wantedTake = input("What take would you like for scene %s?  " %scene)
-                wantedTakes[scene] = wantedTake
-                wantedFile = (projectName + (r'\Scene %s\Take %s.mp4' % (scene, wantedTake)))
-                print(wantedFile)
-                folders.append(wantedFile)
-
             filenames = open("filenames.txt", "w")
 
             # Add all the file names to a txt for concatenation
@@ -204,7 +222,6 @@ class Window(Frame):
                 filenames.write("file '" + folder + "'\n")
             filenames.close()
 
-            # Concatenate and remove the txt file
             ffmpegCall = (r'%s\ffmpeg' % current)
             COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
             call(COMMAND, shell=True, stderr=DEVNULL, stdout=DEVNULL)
