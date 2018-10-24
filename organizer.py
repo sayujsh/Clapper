@@ -110,10 +110,9 @@ class Window(Frame):
 
             while success:
                 if(count%(fps/2)) == 0:
-                    cv2.imwrite('tester.jpg', frame)
                     success, frame = cap.read()
                     count += 1
-                    data = decode(cv2.imread('tester.jpg'), symbols=[ZBarSymbol.QRCODE])
+                    data = decode(frame, symbols=[ZBarSymbol.QRCODE])
                     if data == []:
                         continue
                     else:
@@ -163,8 +162,6 @@ class Window(Frame):
             shutil.move(fileNameFinal, dirNameFinal)
 
             print(timeStampsCleaned)
-
-            os.remove('tester.jpg')
             cap.release()
             cv2.destroyAllWindows()
 
