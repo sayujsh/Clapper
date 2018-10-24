@@ -173,7 +173,7 @@ class Window(Frame):
 
             # Timer for keeping track of performance
             END_TIME = datetime.now()
-            print('Duration to Organize: {}'.format(END_TIME - START_TIME))
+            print('Duration to Organize: {}'.format(END_TIME - START_TIME) + '\n')
             messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
         orgthread = threading.Thread(target=org_thread)
@@ -183,6 +183,7 @@ class Window(Frame):
     def CompileCut(self):
 
         def cut_thread():
+            START_TIME = datetime.now()
             self.CutButton.grid_forget()
             self.CutLabel.grid(row=5, column=0, padx=10, pady=10)
             self.progress.grid(row=5, sticky='E', padx=10, pady=10)
@@ -213,6 +214,8 @@ class Window(Frame):
             self.progress.stop()
             self.progress.grid_forget()
             self.CutLabel['text'] = "Generated!"
+            END_TIME = datetime.now()
+            print('Duration to Organize: {}'.format(END_TIME - START_TIME) + '\n')
             messagebox.showinfo("Finished", "Finished Editing. A rough cut of your project will be in your project folder.")
 
 
