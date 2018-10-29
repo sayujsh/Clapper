@@ -5,7 +5,7 @@ import cv2
 from subprocess import call, DEVNULL
 from datetime import datetime
 from tkinter import Tk, ttk, Frame, Label, HORIZONTAL, messagebox, OptionMenu, StringVar
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askopenfilenames
 from pyzbar.pyzbar import decode, ZBarSymbol
 
 
@@ -87,13 +87,16 @@ class Window(Frame):
         self.finishedButton.grid(row = i+1, column = 0)
 
     def OpenFile(self):
-        global inputDir
-        global inputVideo
+        #global inputDir
+        global inputVideos = []
         # Get the file
-        file = askopenfilename(initialdir=current, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
+        files = askopenfilenames(initialdir=current, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
+        print(files)
         # Split the filepath to get the directory
-        inputDir = os.path.split(file)[0]
-        inputVideo = os.path.split(file)[1]
+        for file in files:
+            inputDir = os.path.split(file)[0]
+            inputVideo = os.path.split(file)[1]
+            inputVideos.append((inputDir, inputVideo))
 
     def Process(self):
         global projectName
@@ -114,7 +117,7 @@ class Window(Frame):
 
             print("CHECK")
 
-            os.chdir(inputDir)
+            os.chdir(inputVideos)
 
             timeStamps = {}
             video = inputVideo
