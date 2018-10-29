@@ -7,6 +7,7 @@ from datetime import datetime
 from tkinter import Tk, ttk, Frame, Label, HORIZONTAL, messagebox, OptionMenu, StringVar
 from tkinter.filedialog import askopenfilename, askopenfilenames
 from pyzbar.pyzbar import decode, ZBarSymbol
+import collections
 
 
 current = os.getcwd()
@@ -71,8 +72,9 @@ class Window(Frame):
         i = 7
         wantedTakes = {}
         folders = []
-        for scene in timeStampsCleaned:
-            takeList = list(timeStampsCleaned[scene].keys())
+        timeStampsOrdered = collections.OrderedDict(timeStampsCleaned)
+        for scene in timeStampsOrdered:
+            takeList = list(timeStampsOrdered[scene].keys())
             wantedTakes[scene] = StringVar(self.master)
             wantedTakes[scene].set(takeList[0])
             self.PickerLabel = Label(self.master, text=("What take would you like for scene %s" % scene))
@@ -88,7 +90,8 @@ class Window(Frame):
 
     def OpenFile(self):
         #global inputDir
-        global inputVideos = []
+        global inputVideos
+        inputVideos = []
         # Get the file
         files = askopenfilenames(initialdir=current, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
         print(files)
@@ -108,16 +111,17 @@ class Window(Frame):
         # Timer for keeping track of performance
         START_TIME = datetime.now()
 
-        def org_thread():
-            global timeStampsCleaned
+        os.chdir(inputVideos[0][0])
+        global timeStampsCleaned
+        timeStampsCleaned = {}
+
+        def org_thread(inputVideo):
             self.processButton.grid_forget()
             self.OrgLabel.grid(row=4, column=0, padx=10, pady=10)
             self.progress.grid(row=4, sticky='E', padx=10, pady=10)
             self.progress.start()
 
             print("CHECK")
-
-            os.chdir(inputVideos)
 
             timeStamps = {}
             video = inputVideo
@@ -134,7 +138,7 @@ class Window(Frame):
             timeStamp1 = ''
 
             while success:
-                if(count%(fps/2)) == 0:
+                if(count%(int(fps/2))) == 0:
                     success, frame = cap.read()
                     count += 1
                     data = decode(frame, symbols=[ZBarSymbol.QRCODE])
@@ -169,7 +173,6 @@ class Window(Frame):
                 else:
                     success, frame = cap.read()
                     count += 1
-            timeStampsCleaned = {}
 
             for key in timeStamps:
                 sceneNum = int(key.split(':')[0])
@@ -190,19 +193,21 @@ class Window(Frame):
             cap.release()
             cv2.destroyAllWindows()
 
-            self.progress.stop()
-            self.progress.grid_forget()
-            self.OrgLabel['text'] = "Organized!"
-            self.CutButton.grid(row=5, column=0, padx=10, pady=10)
-            self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
-
             # Timer for keeping track of performance
             END_TIME = datetime.now()
             print('Duration to Organize: {}'.format(END_TIME - START_TIME) + '\n')
-            messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
-        orgthread = threading.Thread(target=org_thread)
-        orgthread.start()
+        for loc, inputVideo in inputVideos:
+            orgthread = threading.Thread(target=org_thread(inputVideo))
+            orgthread.start()
+
+        self.progress.stop()
+        self.progress.grid_forget()
+        self.OrgLabel['text'] = "Organized!"
+        self.CutButton.grid(row=5, column=0, padx=10, pady=10)
+        self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
+
+        messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
 
     def CompileCut(self):
