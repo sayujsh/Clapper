@@ -110,6 +110,7 @@ class Window(Frame):
         timeStampsCleaned = {}
 
         def org_thread(inputVideo):
+            global success
             self.processButton.grid_forget()
             self.OrgLabel.grid(row=4, column=0, padx=10, pady=10)
             self.progress.grid(row=4, sticky='E', padx=10, pady=10)
@@ -165,6 +166,16 @@ class Window(Frame):
                 else:
                     success, frame = cap.read()
                     count += 1
+            try:
+                self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
+                if not os.path.exists('%s/Scene %d' % (projectName, sceneNumFinal)):
+                    os.makedirs('%s/Scene %d' % (projectName, sceneNumFinal))
+                dirNameFinal = ('%s/Scene %d' % (projectName, sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
+                shutil.move(fileNameFinal, dirNameFinal)
+                success = True
+            except UnboundLocalError:
+                success = False
+                messagebox.showinfo("Error", "There was no QR Code found in this video.")
 
             for key in timeStamps:
                 sceneNum = int(key.split(':')[0])
@@ -174,12 +185,6 @@ class Window(Frame):
                 except:
                     timeStampsCleaned[sceneNum] = {}
                     timeStampsCleaned[sceneNum][takeNum] = timeStamps[key]
-
-            self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
-            if not os.path.exists('%s/Scene %d' % (projectName, sceneNumFinal)):
-                os.makedirs('%s/Scene %d' % (projectName, sceneNumFinal))
-            dirNameFinal = ('%s/Scene %d' % (projectName, sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
-            shutil.move(fileNameFinal, dirNameFinal)
 
             print(timeStampsCleaned)
             cap.release()
@@ -193,13 +198,13 @@ class Window(Frame):
             orgthread = threading.Thread(target=org_thread(inputVideo))
             orgthread.start()
 
-        self.progress.stop()
-        self.progress.grid_forget()
-        self.OrgLabel['text'] = "Organized!"
-        self.CutButton.grid(row=5, column=0, padx=10, pady=10)
-        self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
-
-        messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
+        if(success):
+            self.progress.stop()
+            self.progress.grid_forget()
+            self.OrgLabel['text'] = "Organized!"
+            self.CutButton.grid(row=5, column=0, padx=10, pady=10)
+            self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
+            messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
     def CompileCut(self):
         folders = []
