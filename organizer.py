@@ -9,7 +9,6 @@ from tkinter.filedialog import askopenfilename, askopenfilenames
 from pyzbar.pyzbar import decode, ZBarSymbol
 import collections
 
-
 current = os.getcwd()
 
 class Window(Frame):
@@ -66,15 +65,12 @@ class Window(Frame):
         self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL, length=100,  mode='determinate')
 
     def ScenePicker(self):
-        global folders
         global variables
         global wantedTakes
         i = 7
         wantedTakes = {}
-        folders = []
-        timeStampsOrdered = collections.OrderedDict(timeStampsCleaned)
-        for scene in timeStampsOrdered:
-            takeList = list(timeStampsOrdered[scene].keys())
+        for scene in sorted(timeStampsCleaned):
+            takeList = list(timeStampsCleaned[scene].keys())
             wantedTakes[scene] = StringVar(self.master)
             wantedTakes[scene].set(takeList[0])
             self.PickerLabel = Label(self.master, text=("What take would you like for scene %s" % scene))
@@ -83,10 +79,8 @@ class Window(Frame):
             self.Picker.grid(row = i+1, column = 0)
             i += 2
 
-
-
         self.finishedButton = ttk.Button(self.master, text="Finish", cursor="hand2", width=10, command=self.CompileCut)
-        self.finishedButton.grid(row = i+1, column = 0)
+        self.finishedButton.grid(row=i+1, column=0)
 
     def OpenFile(self):
         #global inputDir
@@ -168,8 +162,6 @@ class Window(Frame):
                                 os.makedirs('%s/Scene %d' % (projectName, sceneNum))
                             dirName = ('%s/Scene %d' % (projectName, sceneNum)) + ('/Take %d' % (takeNum)) + '.mp4'
                             shutil.move(fileName, dirName)
-
-
                 else:
                     success, frame = cap.read()
                     count += 1
@@ -209,12 +201,11 @@ class Window(Frame):
 
         messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
-
     def CompileCut(self):
-
+        folders = []
         def cut_thread():
             START_TIME = datetime.now()
-            for scene in timeStampsCleaned:
+            for scene in sorted(timeStampsCleaned):
                 wantedFile = (projectName + (r'\Scene %s\Take %s.mp4' % (scene, wantedTakes[scene].get())))
                 print(wantedFile)
                 folders.append(wantedFile)
@@ -255,7 +246,6 @@ class Window(Frame):
         trim_command = ffmpegCall + ' -i ' + inputVid + " -ss  " + start + " -to " + end + " -c copy " + outputVid
         call(trim_command, stderr=DEVNULL, stdout=DEVNULL)
         print("Finished cutting: %s" % outputVid)
-
 
 root = Tk()
 # root.tk.call('tk', 'scaling', 3.0)
