@@ -101,6 +101,9 @@ class Window(Frame):
         print("Project Name: %s" % projectName)
         self.Organize()
 
+    # Takes the input video and started searching for the QR codes
+    # When it finds them, it calls the trim function
+    # Also creates a nested Dict with {Scenes:{Takes:Frame}}
     def Organize(self):
         # Timer for keeping track of performance
         START_TIME = datetime.now()
@@ -198,7 +201,7 @@ class Window(Frame):
             orgthread = threading.Thread(target=org_thread(inputVideo))
             orgthread.start()
 
-        if(success):
+        if success:
             self.progress.stop()
             self.progress.grid_forget()
             self.OrgLabel['text'] = "Organized!"
@@ -206,6 +209,9 @@ class Window(Frame):
             self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
             messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
+    # Compiles the different scenes together
+    # Take the input from the multiple drop down menus
+    # Adds the names to a txt file and calls ffmpeg using subprocess
     def CompileCut(self):
         folders = []
         def cut_thread():
