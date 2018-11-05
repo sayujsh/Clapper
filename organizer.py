@@ -9,7 +9,7 @@ from tkinter.filedialog import askopenfilename, askopenfilenames
 from pyzbar.pyzbar import decode, ZBarSymbol
 import collections
 
-current = os.getcwd()
+CURRENT = os.getcwd()
 
 class Window(Frame):
     def __init__(self, master):
@@ -65,7 +65,6 @@ class Window(Frame):
         self.progress = ttk.Progressbar(self.master, orient=HORIZONTAL, length=100,  mode='determinate')
 
     def ScenePicker(self):
-        global variables
         global wantedTakes
         i = 7
         wantedTakes = {}
@@ -87,7 +86,7 @@ class Window(Frame):
         global inputVideos
         inputVideos = []
         # Get the file
-        files = askopenfilenames(initialdir=current, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
+        files = askopenfilenames(initialdir=CURRENT, filetypes=[("Video Files", "*.mov *.mp4 *.avi")])
         print(files)
         # Split the filepath to get the directory
         for file in files:
@@ -96,15 +95,21 @@ class Window(Frame):
             inputVideos.append((inputDir, inputVideo))
 
     def Process(self):
+        ''' Gets the project name from the input box
+            Assigns it to a variable
+            Calls the organize function
+        '''
         global projectName
         projectName = (User_input.get())
         print("Project Name: %s" % projectName)
         self.Organize()
 
-    # Takes the input video and started searching for the QR codes
-    # When it finds them, it calls the trim function
-    # Also creates a nested Dict with {Scenes:{Takes:Frame}}
     def Organize(self):
+        ''' Takes the input video and started searching for the QR codes
+            When it finds them, it calls the Trim function
+            Also creates a nested Dict with {Scenes:{Takes:Frame}}
+        '''
+
         # Timer for keeping track of performance
         START_TIME = datetime.now()
 
@@ -152,7 +157,7 @@ class Window(Frame):
                         if dataClean != timeStamp1:
                             frame2 = count
                             fileName = timeStamp1.split(':')[0] + '.' + timeStamp1.split(':')[1] + '.mp4'
-                            self.trim(str(frame1/fps), str(frame2/fps - 1), video, fileName)
+                            self.Trim(str(frame1/fps), str(frame2/fps - 1), video, fileName)
                             sceneNum = int(timeStamp1.split(':')[0])
                             takeNum = int(timeStamp1.split(':')[1])
 
@@ -170,7 +175,7 @@ class Window(Frame):
                     success, frame = cap.read()
                     count += 1
             try:
-                self.trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
+                self.Trim(str(frame1/fps), str(count/fps), video, fileNameFinal)
                 if not os.path.exists('%s/Scene %d' % (projectName, sceneNumFinal)):
                     os.makedirs('%s/Scene %d' % (projectName, sceneNumFinal))
                 dirNameFinal = ('%s/Scene %d' % (projectName, sceneNumFinal)) + ('/Take %d' % (takeNumFinal)) + '.mp4'
@@ -209,10 +214,11 @@ class Window(Frame):
             self.RoughLabel.grid(row=5, sticky='W', padx=10, pady=10)
             messagebox.showinfo("Finished", "Finished Organizing. Continue to see a rough cut of your project.")
 
-    # Compiles the different scenes together
-    # Take the input from the multiple drop down menus
-    # Adds the names to a txt file and calls ffmpeg using subprocess
     def CompileCut(self):
+        ''' Compiles the different scenes together
+            Take the input from the multiple drop down menus
+            Adds the names to a txt file and calls ffmpeg using subprocess
+        '''
         folders = []
         def cut_thread():
             START_TIME = datetime.now()
@@ -232,9 +238,9 @@ class Window(Frame):
                 filenames.write("file '" + folder + "'\n")
             filenames.close()
 
-            ffmpegCall = (r'%s\ffmpeg' % current)
-            COMMAND = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
-            call(COMMAND, shell=True, stderr=DEVNULL, stdout=DEVNULL)
+            ffmpegCall = (r'%s\ffmpeg' % CURRENT)
+            command = [ffmpegCall, "-f", "concat", "-safe", "0", "-i", "filenames.txt", "-c", "copy", "%s/roughcut.mp4" % (projectName)]
+            call(command, shell=True, stderr=DEVNULL, stdout=DEVNULL)
             print("Finished creating a rough cut.")
             os.remove('filenames.txt')
 
@@ -249,16 +255,16 @@ class Window(Frame):
         cutthread = threading.Thread(target=cut_thread)
         cutthread.start()
 
-    # Edits a given video by the starting and ending points of the video
-    # Uses subprocess to call ffmpeg application to edit the video
-    # As long as it is in the same folder as this python script it will work
-    def trim(self, start, end, inputVid, outputVid):
-        ffmpegCall = (r'"%s\ffmpeg"' % current)
+    def Trim(self, start, end, inputVid, outputVid):
+        ''' Edits a given video by the starting and ending points of the video
+            Uses subprocess to call ffmpeg application to edit the video
+            As long as it is in the same folder as this python script it will work
+        '''
+        ffmpegCall = (r'"%s\ffmpeg"' % CURRENT)
         trim_command = ffmpegCall + ' -i ' + inputVid + " -ss  " + start + " -to " + end + " -c copy " + outputVid
         call(trim_command, stderr=DEVNULL, stdout=DEVNULL)
         print("Finished cutting: %s" % outputVid)
 
 root = Tk()
-# root.tk.call('tk', 'scaling', 3.0)
 Window = Window(root)
 root.mainloop()
